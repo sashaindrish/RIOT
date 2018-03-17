@@ -1,5 +1,5 @@
 # name of your application
-APPLICATION = hello-word-io2
+APPLICATION = Hello_Iot
 
 # If no BOARD is found in the environment, use this default:
 BOARD ?= unwd-range-l1-r3
