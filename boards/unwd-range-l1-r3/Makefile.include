@@ -2,3 +2,8 @@
 export CPU = stm32l1
 export CPU_MODEL = stm32l152re
 
+CFLAGS += -DSTM32L1XX_MPD
+OFLAGS = -O ihex 
+
+
+
