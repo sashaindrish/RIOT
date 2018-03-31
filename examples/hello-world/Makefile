@@ -6,13 +6,17 @@ BOARD ?= unwd-range-l1-r3
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
-
+# либы которые юзаются 
 USEMODULE += rtctimers-millis
+USEMODULE += shell_commands
+USEMODULE += shell  
+USEMODULE += ps
+
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
 DEVELHELP ?= 1
-
+# пременные для перферии 
 FEATURES_REQUIRED += periph_rtc
 FEATURES_REQUIRED += periph_gpio
 
