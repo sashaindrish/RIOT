@@ -143,7 +143,14 @@ uint32_t opt3001_measure(opt3001_t *dev, opt3001_measure_t *measure)
 
     return 0;
 }
-
+/*
+uint32_t opt3001_getLux(opt3001_t *dev){
+	
+	opt3001_measure_t measure_date;
+	
+	
+}
+*/
 
 #ifdef __cplusplus
 }

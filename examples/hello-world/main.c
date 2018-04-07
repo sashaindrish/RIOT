@@ -26,22 +26,29 @@
 
 
 static kernel_pid_t process_pid;
-static msg_t pracss_msg;
+//static msg_t pracss_msg;
 
 #define MY_PROCESS_SIZE (1024)
 
 #define ENABLE_DEBUG (1)
 #include "debug.h"
 
-#include "shell_commands.h"
-#include "shell.h"
+//#include "shell_commands.h"
+//#include "shell.h"
 #include "periph/pm.h"
+#include "xtimer.h"
+#include "periph/i2c.h"
+#include "opt3001.h"
+
 
 
 
 
 uint32_t millisecond_last_press=0;
 
+	opt3001_t opt3001;
+opt3001_measure_t measure_date; 
+/*
 void btn_tolse(void *arg){
 	(void)arg;
 	
@@ -55,16 +62,32 @@ void btn_tolse(void *arg){
 	}
 	
 }
-
+*/
 void *process_treade(void *arg){
 	(void)arg; // присвоение если используется конструкция void *arg 
-	msg_t message;
+	//msg_t message;
 	gpio_set(GPIO_PIN(PORT_B,0));
 	while(1){
 		 
-		msg_receive(&message); // сообщегне процесса 
-		gpio_toggle(GPIO_PIN(PORT_B,0));
-		DEBUG("GEPIO_READE = %d\n",gpio_read(GPIO_PIN(PORT_B,0)));
+		//msg_receive(&message); // сообщегне процесса 
+		if((rtctimers_millis_now()-millisecond_last_press)>1000){
+			millisecond_last_press = rtctimers_millis_now();
+			
+			opt3001_measure(&opt3001, &measure_date);
+			//printf(" luminocity = %lu\n", measure_date.luminocity);
+			
+			if(1020<measure_date.luminocity){
+				
+				printf("luminocity = %lu lux is to high !\n", measure_date.luminocity);
+				
+			}else 
+			{
+				printf("luminocity = %lu lux is to low !\n", measure_date.luminocity);
+			}
+			
+			
+		
+		}
 				
 	}
 	return NULL;
@@ -82,10 +105,7 @@ static int print_echo(int argc, char **argv)
 }
 */
 //////////////////////////////////////////////////////////////////////////////
-static const shell_command_t shell_commands[] = {
-///	{ "echo", "prints the input command", print_echo },
-    { NULL, NULL, NULL }
-};
+
 
 int main(void)
 {
@@ -94,16 +114,25 @@ int main(void)
 	pm_init();
 	pm_prevent_sleep = 1; // запрет энергосбережения 
 	
-	puts("Hello World!");
-	    printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
-    printf("This board features a(n) %s MCU.\n", RIOT_MCU);
 	
 
+	opt3001.i2c = 1;
+	opt3001_init(&opt3001);
+	
+	opt3001_measure(&opt3001, &measure_date);
+	
+
+	    printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
+		printf("This board features a(n) %s MCU.\n", RIOT_MCU);
+		
+	
+	opt3001_measure(&opt3001, &measure_date);
+	printf(" luminocity = %lu\n", measure_date.luminocity);
 	
 	gpio_init(GPIO_PIN(PORT_B,0),GPIO_OUT);
 	gpio_set(GPIO_PIN(PORT_B,0));
 	
-	gpio_init_int(GPIO_PIN(PORT_B,1),GPIO_IN_PU,GPIO_FALLING,btn_tolse,NULL);
+	//gpio_init_int(GPIO_PIN(PORT_B,1),GPIO_IN_PU,GPIO_FALLING,btn_tolse,NULL);
 	
 		char stack[MY_PROCESS_SIZE];
 		process_pid = thread_create(stack, MY_PROCESS_SIZE,
@@ -113,8 +142,8 @@ int main(void)
 									
 	
 	// shell/////////////////////////////////
-	char line_buf[SHELL_DEFAULT_BUFSIZE];
-	shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+//	char line_buf[SHELL_DEFAULT_BUFSIZE];
+//	shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 	////////////////////////////////////
 	
     return 0;

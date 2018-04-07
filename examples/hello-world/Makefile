@@ -11,14 +11,19 @@ USEMODULE += rtctimers-millis
 USEMODULE += shell_commands
 USEMODULE += shell  
 USEMODULE += ps
+USEMODULE += opt3001
+USEMODULE += xtimer
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
 DEVELHELP ?= 1
 # пременные для перферии 
+FEATURES_REQUIRED += periph_i2c
 FEATURES_REQUIRED += periph_rtc
 FEATURES_REQUIRED += periph_gpio
+
+#FEATURES_REQUIRED += xtimer
 
 
 # Change this to 0 show compiler invocation lines by default:
