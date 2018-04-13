@@ -48,21 +48,17 @@ uint32_t millisecond_last_press=0;
 
 	opt3001_t opt3001;
 opt3001_measure_t measure_date; 
-/*
-void btn_tolse(void *arg){
+
+////////////////////////////////////////////////////////////
+void interupt_f(void *arg){
 	(void)arg;
 	
-	
-	if((rtctimers_millis_now()-millisecond_last_press)>200){
-			
-		msg_send(&pracss_msg,process_pid); // сообщение процесса , id процесса 
-		//gpio_toggle(GPIO_PIN(PORT_B,0));
-		millisecond_last_press = rtctimers_millis_now();
-		
-	}
+	opt3001_measure(&opt3001, &measure_date);
+	printf(" luminocity = %lu\n", measure_date.luminocity);
 	
 }
-*/
+////////////////////////////////////////////////////////////
+
 void *process_treade(void *arg){
 	(void)arg; // присвоение если используется конструкция void *arg 
 	//msg_t message;
@@ -109,7 +105,10 @@ static int print_echo(int argc, char **argv)
 
 int main(void)
 {
-	rtctimers_millis_init();
+	rtctimers_millis_init(); // инит таймера 
+	
+	measure_date->lim_lum_high=1000.0;
+	measure_date->lim_lum_low = 100.0;
 	
 	pm_init();
 	pm_prevent_sleep = 1; // запрет энергосбережения 
@@ -121,6 +120,7 @@ int main(void)
 	
 	opt3001_measure(&opt3001, &measure_date);
 	
+	
 
 	    printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
 		printf("This board features a(n) %s MCU.\n", RIOT_MCU);
@@ -131,9 +131,9 @@ int main(void)
 	
 	gpio_init(GPIO_PIN(PORT_B,0),GPIO_OUT);
 	gpio_set(GPIO_PIN(PORT_B,0));
-	
-	//gpio_init_int(GPIO_PIN(PORT_B,1),GPIO_IN_PU,GPIO_FALLING,btn_tolse,NULL);
-	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	gpio_init_int(GPIO_PIN(PORT_A,7),GPIO_IN_PU,GPIO_FALLING,interupt_f,NULL); // gpio portb pin 28 
+	////////////////////////////////////////////////////////////////////////////////////////////////////
 		char stack[MY_PROCESS_SIZE];
 		process_pid = thread_create(stack, MY_PROCESS_SIZE,
 									THREAD_PRIORITY_MAIN-1, THREAD_CREATE_STACKTEST,

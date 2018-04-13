@@ -40,8 +40,8 @@
 #define OPT3001_CFG_FC_4    0x0200
 #define OPT3001_CFG_FC_8    0x0300
 #define OPT3001_CFG_MASK    0x0400
-#define OPT3001_CFG_POLPOS  0x0800
-#define OPT3001_CFG_LATCH   0x1000
+#define OPT3001_CFG_POLPOS  0x0800 // set _/-\_
+#define OPT3001_CFG_LATCH   0x1000 // on pin int
 #define OPT3001_CFG_FLAGL   0x2000
 #define OPT3001_CFG_FLAGH   0x4000
 #define OPT3001_CFG_CRF     0x8000
@@ -53,7 +53,7 @@
 #define OPT3001_CFG_800MS   0x0008
 #define OPT3001_CFG_RNAUTO  0x00C0
 
-#define OPT3001_CFG (OPT3001_CFG_FC_1 | OPT3001_CFG_SHOT | OPT3001_CFG_100MS | OPT3001_CFG_RNAUTO )
+#define OPT3001_CFG (OPT3001_CFG_FC_1 | OPT3001_CFG_SHOT | OPT3001_CFG_100MS | OPT3001_CFG_RNAUTO)
 #define OPT3001_CFG_DEFAULT 0x10C8
 
 /**
@@ -64,6 +64,9 @@
 #define OPT3001_REG_ID            0x7E
 #define OPT3001_CHIP_ID           0x4954
 #define OPT3001_REG_CONFIG_MASK   0xFE1F
+
+#define OPT3001_REG_LOW_LIM		  0x02
+#define OPT3001_REG_HIGH_LIM 	  0x03
 
 /**
  * @brief Structure that holds the OPT3001 driver internal state and parameters
@@ -76,6 +79,8 @@ typedef struct {
 
 typedef struct {
     uint32_t luminocity;        /**< Illuminance in lux */
+	float lim_lum_high;
+	float lim_lum_low;
 } opt3001_measure_t;
 
 /**
@@ -107,5 +112,12 @@ int opt3001_init(opt3001_t *dev);
  * opt3001_measure(opt3001, &measure)
  */
 uint32_t opt3001_measure(opt3001_t *dev, opt3001_measure_t *measure);
+
+uint32_t opt3001_measure_interrupt(opt3001_t *dev, opt3001_measure_t *measure);
+
+int write_registr_lim(opt3001_t *dev, uint8_t addres_reg, uint16_t reg, uint16_t size);
+
+uint16_t get_data_reg(uint16_t data);
+
 
 #endif /* OPT3001_H_ */
