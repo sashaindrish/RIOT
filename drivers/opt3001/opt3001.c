@@ -62,6 +62,8 @@ int opt3001_init(opt3001_t *dev)
         i2c_release(dev->i2c);
         return -1;
     }
+	
+
     /*
     i2c_read_regs(dev->i2c, OPT3001_ADDRESS, OPT3001_REG_CONFIG, (char *)&chipid, 2);
     
@@ -82,7 +84,7 @@ static uint32_t read_sensor(opt3001_t *dev) {
     data = OPT3001_CFG;
 	/* write in reg dev , addres reg, data reg */
 	
-	write_registr(&dev, OPT3001_REG_CONFIG, data, 2);
+	write_registr(dev, OPT3001_REG_CONFIG, data, 2);
 
     /* read result */
     i2c_read_regs(dev->i2c, OPT3001_ADDRESS, OPT3001_REG_RESULT, (char *)&data, 2);
@@ -129,37 +131,30 @@ uint32_t opt3001_measure(opt3001_t *dev, opt3001_measure_t *measure)
     return 0;
 }
 
- /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-uint32_t opt3001_measure_interrupt(opt3001_t *dev, opt3001_measure_t *measure){
-	
-
-	return 0;
-}
 
  /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-static uint32_t write_sensor_lim(opt3001_t *dev, opt3001_measure_t *measure) {
+void write_sensor_lim(opt3001_t *dev, float lim_lum_high, float lim_lum_low) {
     uint16_t data;
     data = OPT3001_CFG;
-	write_registr(&dev, OPT3001_REG_CONFIG, data, 2);
+	write_registr(dev, OPT3001_REG_CONFIG, data, 2);
 	
 	
 	
-	float lum = measure->lim_lum_high;
+	float lum = lim_lum_high;
 	
 	lum = get_data_reg(lum);
 	
 	
-	write_registr(&dev, OPT3001_REG_HIGH_LIM, lum, 2);
+	write_registr(dev, OPT3001_REG_HIGH_LIM, lum, 2);
 	
-	lum = measure->lim_lum_low;
+	lum = lim_lum_low;
 	
 	lum = get_data_reg(lum);
 		
-	write_registr(&dev, OPT3001_REG_LOW_LIM, lum, 2);
+	write_registr(dev, OPT3001_REG_LOW_LIM, lum, 2);
 	
-    return (((uint32_t)data * lsb_size_x100) / 100);
+    
    
     
 }
@@ -187,7 +182,7 @@ int write_registr(opt3001_t *dev, uint8_t addres_reg,uint16_t reg, uint16_t size
     
     if (i == 0) {
         return 0;
-    }
+    }else return 1;
 
 	
 }

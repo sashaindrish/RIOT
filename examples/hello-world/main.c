@@ -41,20 +41,19 @@ static kernel_pid_t process_pid;
 #include "opt3001.h"
 
 
-
-
-
 uint32_t millisecond_last_press=0;
 
-	opt3001_t opt3001;
+opt3001_t opt3001;
 opt3001_measure_t measure_date; 
+	
 
 ////////////////////////////////////////////////////////////
 void interupt_f(void *arg){
 	(void)arg;
 	
 	opt3001_measure(&opt3001, &measure_date);
-	printf(" luminocity = %lu\n", measure_date.luminocity);
+	printf(" luminocity = %lu\n **** interupt****", measure_date.luminocity);
+	 gpio_toggle(GPIO_PIN(PORT_B,0));
 	
 }
 ////////////////////////////////////////////////////////////
@@ -70,7 +69,7 @@ void *process_treade(void *arg){
 			millisecond_last_press = rtctimers_millis_now();
 			
 			opt3001_measure(&opt3001, &measure_date);
-			//printf(" luminocity = %lu\n", measure_date.luminocity);
+			printf(" luminocity = %lu\n", measure_date.luminocity);
 			
 			if(1020<measure_date.luminocity){
 				
@@ -107,8 +106,8 @@ int main(void)
 {
 	rtctimers_millis_init(); // инит таймера 
 	
-	measure_date->lim_lum_high=1000.0;
-	measure_date->lim_lum_low = 100.0;
+	float lim_high=1000.0;
+	float lim_low = 100.0;
 	
 	pm_init();
 	pm_prevent_sleep = 1; // запрет энергосбережения 
@@ -117,7 +116,7 @@ int main(void)
 
 	opt3001.i2c = 1;
 	opt3001_init(&opt3001);
-	
+	write_sensor_lim(&opt3001,lim_high,lim_low);
 	opt3001_measure(&opt3001, &measure_date);
 	
 	
@@ -125,9 +124,8 @@ int main(void)
 	    printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
 		printf("This board features a(n) %s MCU.\n", RIOT_MCU);
 		
-	
-	opt3001_measure(&opt3001, &measure_date);
-	printf(" luminocity = %lu\n", measure_date.luminocity);
+
+//	printf(" luminocity = %lu\n", measure_date.luminocity);
 	
 	gpio_init(GPIO_PIN(PORT_B,0),GPIO_OUT);
 	gpio_set(GPIO_PIN(PORT_B,0));

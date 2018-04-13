@@ -71,7 +71,7 @@
 /**
  * @brief Structure that holds the OPT3001 driver internal state and parameters
  */
-typedef struct {
+ typedef struct {
     i2c_t i2c;    /**< Holds driver parameters */
 
 } opt3001_t;
@@ -79,8 +79,6 @@ typedef struct {
 
 typedef struct {
     uint32_t luminocity;        /**< Illuminance in lux */
-	float lim_lum_high;
-	float lim_lum_low;
 } opt3001_measure_t;
 
 /**
@@ -113,11 +111,15 @@ int opt3001_init(opt3001_t *dev);
  */
 uint32_t opt3001_measure(opt3001_t *dev, opt3001_measure_t *measure);
 
-uint32_t opt3001_measure_interrupt(opt3001_t *dev, opt3001_measure_t *measure);
+//uint32_t opt3001_measure_interrupt(opt3001_t *dev, opt3001_measure_t *measure);
 
-int write_registr_lim(opt3001_t *dev, uint8_t addres_reg, uint16_t reg, uint16_t size);
+int write_registr(opt3001_t *dev, uint8_t addres_reg, uint16_t reg, uint16_t size);
 
-uint16_t get_data_reg(uint16_t data);
+void write_sensor_lim(opt3001_t *dev, float lim_lum_high, float lim_lum_low);
+
+uint16_t get_data_reg(float data);
+
+int write_registr(opt3001_t *dev, uint8_t addres_reg,uint16_t reg, uint16_t size);
 
 
 #endif /* OPT3001_H_ */
