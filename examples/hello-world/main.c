@@ -40,7 +40,7 @@ static kernel_pid_t process_pid;
 #include "periph/i2c.h"
 #include "opt3001.h"
 #include "periph/adc.h"
-
+#include "periph/pwm.h"
 uint32_t millisecond_last_press=0;
 
 //opt3001_t opt3001;
@@ -115,7 +115,17 @@ int main(void)
 	//write_sensor_lim(&opt3001,lim_high,lim_low);
 	//opt3001_measure(&opt3001, &measure_date);
 	
-	adc_init(3);
+	adc_init(ADC_VREF_INDEX);
+	
+	pwm_init(PWM_DEV(0), PWM_LEFT, 5, 10);
+	
+	//gpio_init_af(GPIO_PIN(PORT_A,5),GPIO_AF1);
+	
+	pwm_poweron(PWM_DEV(0));
+	pwm_start(PWM_DEV(0));
+	pwm_set(PWM_DEV(0), 100, 200);
+	
+	
 	
 
 	    printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
