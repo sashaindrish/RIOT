@@ -12,7 +12,7 @@
  * @{
  * @file        opt3001.c
  * @brief       basic driver for OPT3001 sensor
- * @authoh      Oleg Artamonov [info@unwds.com]
+ * @authoh      Oleg Artamonov [info@unwds.com], Indrishenok Alexandr [https://github.com/sashaindrish]
  */
 
 

@@ -13,7 +13,8 @@
  * @{
  * @file		opt3001.h
  * @brief       driver for OPT3001 sensor
- * @author      Oleg Artamonov [info@unwds.com]
+ * @author      Oleg Artamonov [info@unwds.com],Indrishenok Alexandr [https://github.com/sashaindrish] 
+ *
  */
 #ifndef OPT3001_H_
 #define OPT3001_H_

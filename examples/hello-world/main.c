@@ -39,21 +39,24 @@ static kernel_pid_t process_pid;
 #include "xtimer.h"
 #include "periph/i2c.h"
 #include "opt3001.h"
-
+#include "periph/adc.h"
 
 uint32_t millisecond_last_press=0;
 
-opt3001_t opt3001;
-opt3001_measure_t measure_date; 
+//opt3001_t opt3001;
+//opt3001_measure_t measure_date;
+	//float lim_high=1000.0;
+	//float lim_low = 100.0; 
 	
 
 ////////////////////////////////////////////////////////////
 void interupt_f(void *arg){
 	(void)arg;
 	
-	opt3001_measure(&opt3001, &measure_date);
-	printf(" luminocity = %lu\n **** interupt****", measure_date.luminocity);
-	 gpio_toggle(GPIO_PIN(PORT_B,0));
+	//opt3001_measure(&opt3001, &measure_date);
+	//printf(" luminocity = %lu\n **** interupt****", measure_date.luminocity);
+	// gpio_toggle(GPIO_PIN(PORT_B,0));
+	// write_sensor_lim(&opt3001,lim_high,lim_low);
 	
 }
 ////////////////////////////////////////////////////////////
@@ -68,18 +71,12 @@ void *process_treade(void *arg){
 		if((rtctimers_millis_now()-millisecond_last_press)>1000){
 			millisecond_last_press = rtctimers_millis_now();
 			
-			opt3001_measure(&opt3001, &measure_date);
-			printf(" luminocity = %lu\n", measure_date.luminocity);
+			int adc_sample_data = adc_sample( 3, ADC_RES_12BIT);
+			int vref = adc_sample(ADC_VREF_INDEX,ADC_RES_12BIT);
+			int voltage = (adc_sample_data*vref)/1024;
 			
-			if(1020<measure_date.luminocity){
-				
-				printf("luminocity = %lu lux is to high !\n", measure_date.luminocity);
-				
-			}else 
-			{
-				printf("luminocity = %lu lux is to low !\n", measure_date.luminocity);
-			}
-			
+			printf("adc = %d\r\n",adc_sample_data);
+			printf("voltage = %d\r\n",voltage);
 			
 		
 		}
@@ -106,19 +103,19 @@ int main(void)
 {
 	rtctimers_millis_init(); // инит таймера 
 	
-	float lim_high=1000.0;
-	float lim_low = 100.0;
+	
 	
 	pm_init();
 	pm_prevent_sleep = 1; // запрет энергосбережения 
 	
 	
 
-	opt3001.i2c = 1;
-	opt3001_init(&opt3001);
-	write_sensor_lim(&opt3001,lim_high,lim_low);
-	opt3001_measure(&opt3001, &measure_date);
+	//opt3001.i2c = 1;
+	//opt3001_init(&opt3001);
+	//write_sensor_lim(&opt3001,lim_high,lim_low);
+	//opt3001_measure(&opt3001, &measure_date);
 	
+	adc_init(3);
 	
 
 	    printf("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
@@ -130,8 +127,10 @@ int main(void)
 	gpio_init(GPIO_PIN(PORT_B,0),GPIO_OUT);
 	gpio_set(GPIO_PIN(PORT_B,0));
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
-	gpio_init_int(GPIO_PIN(PORT_A,7),GPIO_IN_PU,GPIO_FALLING,interupt_f,NULL); // gpio portb pin 28 
+	//gpio_init_int(GPIO_PIN(PORT_A,7),GPIO_IN_PU,GPIO_FALLING,interupt_f,NULL); // gpio portb pin 28 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
 		char stack[MY_PROCESS_SIZE];
 		process_pid = thread_create(stack, MY_PROCESS_SIZE,
 									THREAD_PRIORITY_MAIN-1, THREAD_CREATE_STACKTEST,
